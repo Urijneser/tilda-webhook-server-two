@@ -20,6 +20,13 @@ app.post('/tilda-webhook', (req, res) => {
     domain = 'некорректный referer';
   }
 
+  // Проверяем домен и выводим соответствующее сообщение
+  if (domain === 'performia-seminar.ru') {
+    console.log('✅ Этот домен работает');
+  } else {
+    console.log('❌ Этот домен не работает');
+  }
+
   const { formid, tranid, ...formData } = req.body;
   
   if (Object.keys(formData).length === 0) {
@@ -30,9 +37,9 @@ app.post('/tilda-webhook', (req, res) => {
   // Сохраняем данные + домен источника
   leads.push({ 
     ...formData, 
-    domain,  // Добавляем домен в данные
+    domain,
     date: new Date(),
-    headers: {  // Дополнительно сохраняем заголовки для отладки
+    headers: {
       referer: req.headers.referer,
       origin: req.headers.origin,
       ip: req.ip
