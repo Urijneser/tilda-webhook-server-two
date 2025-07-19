@@ -3,37 +3,26 @@ const bodyParser = require('body-parser');
 const app = express();
 
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); // Важно для Tilda!
 
 let leads = [];
 
-// Обработчик вебхука от Tilda с проверкой домена
+// Обработчик для Tilda
 app.post('/tilda-webhook', (req, res) => {
-  const referer = req.headers.referer || req.headers.origin; // Получаем домен источника
-  const domain = referer ? new URL(referer).hostname : null; // Извлекаем имя домена
+  // Данные от Tilda приходят в поле "form" или напрямую в теле
+  const formData = req.body.form || req.body;
+  const { name, phone, email } = formData;
 
-  // Проверяем, разрешён ли домен
-  const allowedDomains = ['performia-seminar.ru' , 'performia-cis.ru']; // Замените на свои домены
-  if (!allowedDomains.includes(domain)) {
-    console.log('Доступ запрещён для домена:', domain);
-    return res.status(403).send('Домен не разрешён, ага, ну?');
+  if (!name && !phone && !email) {
+    console.log('Получены неверные данные:', req.body);
+    return res.status(400).send('Не хватает полей (name, phone, email)');
   }
 
-  // Обработка данных, если домен правильный
-  const { Email, Name, Phone } = req.body;
-  leads.push({ 
-    name: Name, 
-    phone: Phone, 
-    email: Email,
-    domain, // Сохраняем домен для аналитики
-    date: new Date() 
-  });
-  
-  console.log('Новая заявка с домена', domain, { name: Name, phone: Phone, email: Email });
+  leads.push({ name, phone, email, date: new Date() });
+  console.log('Новая заявка:', { name, phone, email });
   res.status(200).send('OK');
 });
 
-// Для просмотра всех заявок
 app.get('/leads', (req, res) => {
   res.json(leads);
 });
