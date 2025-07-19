@@ -13,10 +13,10 @@ app.post('/tilda-webhook', (req, res) => {
   const domain = referer ? new URL(referer).hostname : null; // Извлекаем имя домена
 
   // Проверяем, разрешён ли домен
-  const allowedDomains = ['performia-seminar.ru' , 'https://performia-cis.ru']; // Замените на свои домены
+  const allowedDomains = ['performia-seminar.ru' , 'performia-cis.ru']; // Замените на свои домены
   if (!allowedDomains.includes(domain)) {
     console.log('Доступ запрещён для домена:', domain);
-    return res.status(403).send('Домен не разрешён');
+    return res.status(403).send('Домен не разрешён, ага, ну?');
   }
 
   // Обработка данных, если домен правильный
